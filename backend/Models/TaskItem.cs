@@ -14,6 +14,7 @@ namespace ProjectManagementApp.API.Models
         public int? EstimatedHours { get; set; }
         public string Status { get; set; } // ToDo, InProgress, Review, Done, Rejected
         public string AssignedToId { get; set; }
+        public DateTime? CompletionDate { get; set; }
         public List<TaskDependency> Dependencies { get; set; }
         public Project Project { get; set; }
     }
