@@ -1,0 +1,66 @@
+# --- .NET / C# ---
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.pdb
+*.dbmdl
+*.log
+*.vs/
+*.vscode/
+*.ncrunch*
+_ReSharper*/
+*.DotSettings.user
+
+# ASP.NET Scaffolding
+ScaffoldingReadMe.txt
+
+# --- Build output ---
+*.dll
+*.exe
+*.app
+*.appx
+*.msi
+*.nupkg
+
+# --- NuGet ---
+*.nupkg
+*.snupkg
+.nuget/
+packages/
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# --- Rider ---
+.idea/
+
+# --- Logs ---
+*.log
+logs/
+
+# --- OS ---
+Thumbs.db
+.DS_Store
+ehthumbs.db
+desktop.ini
+
+# --- Frontend ---
+node_modules/
+dist/
+build/
+.env
+.env.local
+.env.*.local
+
+# --- Misc ---
+*.bak
+*.tmp
+
+# Optional: Database files
+*.mdf
+*.ldf
+*.sqlite
+*.sql
