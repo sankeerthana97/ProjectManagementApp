@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProjectManagementApp.API.Models;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -140,15 +141,15 @@ namespace ProjectManagementApp.API.Controllers
 
             return Ok(completionData);
         }
-
-        // Helper to get the start of the week
-        private static class DateTimeExtensions
-        {
-            public static DateTime StartOfWeek(this DateTime dt, DayOfWeek startOfWeek)
-            {
-                var diff = (7 + (dt.DayOfWeek - startOfWeek)) % 7;
-                return dt.AddDays(-1 * diff).Date;
-            }
-        }
     }
-} 
+}
+
+// Extension method class must be outside the controller class and namespace it as needed
+public static class DateTimeExtensions
+{
+    public static DateTime StartOfWeek(this DateTime dt, DayOfWeek startOfWeek)
+    {
+        var diff = (7 + (dt.DayOfWeek - startOfWeek)) % 7;
+        return dt.AddDays(-1 * diff).Date;
+    }
+}

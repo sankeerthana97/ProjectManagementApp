@@ -22,7 +22,10 @@ namespace ProjectManagementApp.API.Controllers
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IConfiguration _configuration;
 
-        public AuthController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IConfiguration configuration)
+        public AuthController(
+            UserManager<ApplicationUser> userManager,
+            SignInManager<ApplicationUser> signInManager,
+            IConfiguration configuration)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -40,6 +43,7 @@ namespace ProjectManagementApp.API.Controllers
                 Skills = model.Skills,
                 Role = model.Role
             };
+
             var result = await _userManager.CreateAsync(user, model.Password);
             if (!result.Succeeded)
                 return BadRequest(result.Errors);
@@ -60,8 +64,9 @@ namespace ProjectManagementApp.API.Controllers
                 return Unauthorized("Invalid credentials");
 
             var roles = await _userManager.GetRolesAsync(user);
-            var token = GenerateJwtToken(user, roles);
-            return Ok(new { token = new JwtSecurityTokenHandler().WriteToken(token) });
+            // GenerateJwtToken already returns the serialized JWT string
+            var jwt = GenerateJwtToken(user, roles);
+            return Ok(new { token = jwt });
         }
 
         [Authorize]
@@ -71,6 +76,7 @@ namespace ProjectManagementApp.API.Controllers
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
                 return NotFound();
+
             var roles = await _userManager.GetRolesAsync(user);
             return Ok(new
             {
@@ -95,6 +101,7 @@ namespace ProjectManagementApp.API.Controllers
                 Skills = model.Skills,
                 Role = model.Role
             };
+
             var result = await _userManager.CreateAsync(user, model.Password);
             if (!result.Succeeded)
                 return BadRequest(result.Errors);
@@ -109,22 +116,16 @@ namespace ProjectManagementApp.API.Controllers
         {
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
-            {
                 return NotFound("User not found.");
-            }
 
             var currentRoles = await _userManager.GetRolesAsync(user);
             var removeResult = await _userManager.RemoveFromRolesAsync(user, currentRoles);
             if (!removeResult.Succeeded)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Error removing existing roles.");
-            }
+                return StatusCode(500, "Error removing existing roles.");
 
             var addResult = await _userManager.AddToRoleAsync(user, model.NewRole);
             if (!addResult.Succeeded)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Error adding new role.");
-            }
+                return StatusCode(500, "Error adding new role.");
 
             return Ok(new { message = "User role updated successfully." });
         }
@@ -143,53 +144,59 @@ namespace ProjectManagementApp.API.Controllers
                 {
                     user.Id,
                     user.Email,
-                    Role = roles.FirstOrDefault() // Assuming a user has only one role for simplicity
+                    Role = roles.FirstOrDefault() // assume single-role
                 });
             }
 
             return Ok(userList);
         }
 
-        private string GenerateJwtToken(ApplicationUser user, System.Collections.Generic.IList<string> roles)
+        // Now returns the already-serialized JWT string
+        private string GenerateJwtToken(ApplicationUser user, IList<string> roles)
         {
-            var claims = new[]
+            var claims = new List<Claim>
             {
                 new Claim(JwtRegisteredClaimNames.Sub, user.Id),
-                new Claim(JwtRegisteredClaimNames.Email, user.Email),
-                new Claim(ClaimTypes.Name, user.UserName),
+                new Claim(JwtRegisteredClaimNames.Email, user.Email!),
+                new Claim(ClaimTypes.Name, user.UserName!),
                 new Claim(ClaimTypes.NameIdentifier, user.Id),
                 new Claim(ClaimTypes.Role, user.Role ?? "Employee")
             };
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+            // include all roles as separate claims if you want:
+            foreach (var r in roles)
+                claims.Add(new Claim(ClaimTypes.Role, r));
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-            var token = new JwtSecurityToken(
+            var jwt = new JwtSecurityToken(
                 issuer: _configuration["Jwt:Issuer"],
                 audience: _configuration["Jwt:Audience"],
                 claims: claims,
-                expires: DateTime.Now.AddMinutes(Convert.ToDouble(_configuration["Jwt:ExpireMinutes"])),
+                expires: DateTime.UtcNow.AddMinutes(double.Parse(_configuration["Jwt:ExpireMinutes"]!)),
                 signingCredentials: creds
             );
-            return new JwtSecurityTokenHandler().WriteToken(token);
+
+            return new JwtSecurityTokenHandler().WriteToken(jwt);
         }
     }
 
     public class RegisterModel
     {
-        public string Email { get; set; }
-        public string Password { get; set; }
-        public string FullName { get; set; }
-        public string Skills { get; set; }
-        public string Role { get; set; } // Manager, TeamLead, Employee
+        public required string Email { get; set; }
+        public required string Password { get; set; }
+        public required string FullName { get; set; }
+        public string? Skills { get; set; }
+        public required string Role { get; set; } // Manager, TeamLead, Employee
     }
 
     public class LoginModel
     {
-        public string Email { get; set; }
-        public string Password { get; set; }
+        public required string Email { get; set; }
+        public required string Password { get; set; }
     }
 
     public class UpdateRoleModel
     {
-        public string NewRole { get; set; }
+        public required string NewRole { get; set; }
     }
-} 
+}

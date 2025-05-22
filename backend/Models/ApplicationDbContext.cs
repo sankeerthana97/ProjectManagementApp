@@ -15,5 +15,7 @@ namespace ProjectManagementApp.API.Models
         public DbSet<Discrepancy> Discrepancies { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<UserAvailability> UserAvailabilities { get; set; }
+        public DbSet<ProjectMember> ProjectMembers { get; set; }
+
     }
 } 
