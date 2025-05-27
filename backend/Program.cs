@@ -7,9 +7,6 @@ using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Explicitly set the content root path
-builder.Environment.ContentRootPath = "backend";
-
 // Configure background service behavior
 builder.Host.ConfigureServices((hostContext, services) =>
 {
@@ -91,6 +88,8 @@ app.UseCors(builder => builder
     .AllowAnyHeader()
     .AllowCredentials());
 
+app.UseHttpsRedirection();
+
 // Serve static files before routing
 app.UseDefaultFiles(new DefaultFilesOptions
 {
@@ -98,7 +97,6 @@ app.UseDefaultFiles(new DefaultFilesOptions
 });
 app.UseStaticFiles();
 
-app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
