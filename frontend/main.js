@@ -112,23 +112,37 @@ async function handleRegister(e) {
 async function loadDashboard() {
     document.getElementById('auth-container').style.display = 'none';
     document.getElementById('dashboard-root').style.display = 'block';
+
     try {
         const jwt = localStorage.getItem('jwt');
-        const res = await fetch(`${apiBase}/auth/me`, {
-            headers: { 'Authorization': `Bearer ${jwt}` }
-        });
-        if (!res.ok) {
-            throw new Error('Failed to fetch user info');
+        if (!jwt) {
+            throw new Error('No JWT found. Redirecting to login...');
         }
+
+        const res = await fetch(`${apiBase}/auth/me`, {
+            headers: {
+                'Authorization': `Bearer ${jwt}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!res.ok) {
+            throw new Error(`Failed to fetch user info. Status: ${res.status}`);
+        }
+
         const user = await res.json();
-        window.currentUser = user; // Store user info globally (consider security implications)
+
+        // Store user info globally (avoid if not necessary)
+        window.currentUser = user;
+
         renderDashboardShell(user);
     } catch (error) {
-        console.error('Dashboard load error:', error);
+        console.error('Dashboard load error:', error.message);
         localStorage.removeItem('jwt');
         showLogin();
     }
 }
+
 
 function renderDashboardShell(user) {
     document.getElementById('dashboard-root').innerHTML = `

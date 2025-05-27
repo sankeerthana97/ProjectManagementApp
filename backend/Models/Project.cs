@@ -6,15 +6,15 @@ namespace ProjectManagementApp.API.Models
     public class Project
     {
         public int Id { get; set; }
-        public string Name { get; set; }
-        public string SkillsRequired { get; set; }
-        public string Category { get; set; } // Minor, Major
-        public string Priority { get; set; } // High, Medium, Low
+        public string Name { get; set; } = string.Empty;
+        public string SkillsRequired { get; set; } = string.Empty ;
+        public string Category { get; set; } = string.Empty;// Minor, Major
+        public string Priority { get; set; } = string.Empty;// High, Medium, Low
         public DateTime StartDate { get; set; }
         public DateTime Deadline { get; set; }
-        public string Requirements { get; set; }
-        public string TeamLeadId { get; set; }
-        public List<ProjectMember> Members { get; set; }
+        public string Requirements { get; set; } = string.Empty;
+        public string TeamLeadId { get; set; } = string.Empty;
+        public List<ProjectMember> Members { get; set; } = new List<ProjectMember>();
         public bool IsArchived { get; set; }
     }
 

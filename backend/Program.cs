@@ -33,16 +33,26 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
     };
 });
+
+builder.Services.AddAuthorization();
+
+// Add CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
+
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Project API", Version = "v1" });
 });
-
-
-builder.Services.AddAuthorization();
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 
 var smtpConfig = builder.Configuration.GetSection("Smtp");
 builder.Services.AddSingleton(new ProjectManagementApp.API.Services.EmailService(
@@ -54,11 +64,11 @@ builder.Services.AddSingleton(new ProjectManagementApp.API.Services.EmailService
 ));
 
 builder.Services.AddScoped<ProjectManagementApp.API.Services.NotificationService>();
-
 builder.Services.AddHostedService<ProjectManagementApp.API.Services.TaskReminderService>();
 
 var app = builder.Build();
 
+// Middleware
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -66,13 +76,24 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Add CORS middleware BEFORE authentication
+app.UseCors("AllowFrontend");
+
 app.UseAuthentication();
 app.UseAuthorization();
+
 app.MapControllers();
 
-// Seed roles on startup
-using (var scope = app.Services.CreateScope())
+// Call async method to seed roles
+await SeedRolesAsync(app.Services);
+
+app.Run();
+
+// Async method to seed roles
+async Task SeedRolesAsync(IServiceProvider services)
 {
+    using var scope = services.CreateScope();
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
     string[] roles = new[] { "Manager", "TeamLead", "Employee" };
     foreach (var role in roles)
@@ -83,5 +104,3 @@ using (var scope = app.Services.CreateScope())
         }
     }
 }
-
-app.Run(); 

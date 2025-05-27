@@ -7,15 +7,15 @@ namespace ProjectManagementApp.API.Models
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
-        public DbSet<ProfileCard> ProfileCards { get; set; }
-        public DbSet<Project> Projects { get; set; }
-        public DbSet<TaskItem> Tasks { get; set; }
-        public DbSet<TaskHistory> TaskHistories { get; set; }
-        public DbSet<ProjectHistory> ProjectHistories { get; set; }
-        public DbSet<Discrepancy> Discrepancies { get; set; }
-        public DbSet<Notification> Notifications { get; set; }
-        public DbSet<UserAvailability> UserAvailabilities { get; set; }
-        public DbSet<ProjectMember> ProjectMembers { get; set; }
-
+        public DbSet<ProfileCard> ProfileCards { get; set; } = null!;
+        public DbSet<Project> Projects { get; set; } = null!;
+        public DbSet<TaskItem> Tasks { get; set; } = null!;
+        public DbSet<TaskHistory> TaskHistories { get; set; } = null!;
+        public DbSet<ProjectHistory> ProjectHistories { get; set; } = null!;
+        public DbSet<Discrepancy> Discrepancies { get; set; } = null!;
+        public DbSet<Notification> Notifications { get; set; } = null!;
+        public DbSet<UserAvailability> UserAvailabilities { get; set; } = null!;
+        public DbSet<ProjectMember> ProjectMembers { get; set; } = null!;
     }
-} 
+
+}
