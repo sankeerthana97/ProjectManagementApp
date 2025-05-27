@@ -243,13 +243,13 @@ namespace ProjectManagementApp.API.Controllers
 
         public class TaskStatusUpdateModel
         {
-            public string NewStatus { get; set; }
-            public string Comment { get; set; }
+            public required string NewStatus { get; set; }
+            public required string Comment { get; set; }
         }
 
         public class TaskLogModel
         {
-            public string Comment { get; set; }
+            public required string Comment { get; set; }
             // public int TimeSpentHours { get; set; } // Uncomment if you want to track hours
         }
     }

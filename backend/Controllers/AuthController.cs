@@ -182,21 +182,21 @@ namespace ProjectManagementApp.API.Controllers
 
     public class RegisterModel
     {
-        public string Email { get; set; }
-        public string Password { get; set; }
-        public string FullName { get; set; }
+        public required string Email { get; set; }
+        public required string Password { get; set; }
+        public required string FullName { get; set; }
         public string? Skills { get; set; }
-        public string Role { get; set; } // Manager, TeamLead, Employee
+        public required string Role { get; set; } // Manager, TeamLead, Employee
     }
 
     public class LoginModel
     {
-        public string Email { get; set; }
-        public string Password { get; set; }
+        public required string Email { get; set; }
+        public required string Password { get; set; }
     }
 
     public class UpdateRoleModel
     {
-        public string NewRole { get; set; }
+        public required string NewRole { get; set; }
     }
 }
