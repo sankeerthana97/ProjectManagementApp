@@ -77,13 +77,27 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-// Add CORS middleware BEFORE authentication
-app.UseCors("AllowFrontend");
+// Add static files middleware before routing
+app.UseDefaultFiles(new DefaultFilesOptions
+{
+    DefaultFileNames = new List<string> { "index.html" }
+});
+app.UseStaticFiles();
+
+// Configure CORS
+app.UseCors(builder => builder
+    .WithOrigins("https://localhost:5001", "http://localhost:5000")
+    .AllowAnyMethod()
+    .AllowAnyHeader()
+    .AllowCredentials());
 
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+// Add a fallback route to serve index.html for the SPA
+app.MapFallbackToFile("index.html");
 
 // Call async method to seed roles
 await SeedRolesAsync(app.Services);
