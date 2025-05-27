@@ -74,29 +74,25 @@ builder.Services.AddHostedService<ProjectManagementApp.API.Services.TaskReminder
 
 var app = builder.Build();
 
-// Middleware
+// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
-
-// Add static files middleware before routing
-app.UseDefaultFiles(new DefaultFilesOptions
-{
-    DefaultFileNames = new List<string> { "index.html" }
-});
-app.UseStaticFiles();
-
-// Configure CORS
+// Configure CORS before other middleware
 app.UseCors(builder => builder
     .WithOrigins("https://localhost:5001", "http://localhost:5000")
     .AllowAnyMethod()
     .AllowAnyHeader()
     .AllowCredentials());
 
+// Serve static files before routing
+app.UseDefaultFiles();
+app.UseStaticFiles();
+
+app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
