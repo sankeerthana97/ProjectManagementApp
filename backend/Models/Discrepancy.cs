@@ -6,9 +6,9 @@ namespace ProjectManagementApp.API.Models
     {
         public int Id { get; set; }
         public int ProjectId { get; set; }
-        public required string RaisedById { get; set; }
-        public required string Description { get; set; }
-        public required string Status { get; set; } // Open, Resolved
+        public string RaisedById { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public string Status { get; set; } = string.Empty; // Open, Resolved
         public string? ResolutionComment { get; set; }
         public DateTime RaisedAt { get; set; }
         public DateTime? ResolvedAt { get; set; }

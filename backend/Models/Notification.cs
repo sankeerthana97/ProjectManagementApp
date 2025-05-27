@@ -5,9 +5,9 @@ namespace ProjectManagementApp.API.Models
     public class Notification
     {
         public int Id { get; set; }
-        public required string UserId { get; set; }
-        public required string Message { get; set; }
-        public required string Type { get; set; } // Email, System
+        public string UserId { get; set; } = string.Empty;
+        public string Message { get; set; } = string.Empty;
+        public string Type { get; set; } = string.Empty; // Email, System
         public bool IsRead { get; set; }
         public DateTime CreatedAt { get; set; }
     }

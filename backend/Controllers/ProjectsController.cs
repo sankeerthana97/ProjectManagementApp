@@ -239,8 +239,8 @@ namespace ProjectManagementApp.API.Controllers
 
         public class BroadcastModel
         {
-            public required string Subject { get; set; }
-            public required string Message { get; set; }
+            public string Subject { get; set; } = string.Empty;
+            public string Message { get; set; } = string.Empty;
         }
     }
 } 

@@ -6,15 +6,15 @@ namespace ProjectManagementApp.API.Models
     public class Project
     {
         public int Id { get; set; }
-        public required string Name { get; set; }
-        public required string SkillsRequired { get; set; }
-        public required string Category { get; set; } // Minor, Major
-        public required string Priority { get; set; } // High, Medium, Low
+        public string Name { get; set; } = string.Empty;
+        public string SkillsRequired { get; set; } = string.Empty;
+        public string Category { get; set; } = string.Empty; // Minor, Major
+        public string Priority { get; set; } = string.Empty; // High, Medium, Low
         public DateTime StartDate { get; set; }
         public DateTime Deadline { get; set; }
-        public required string Requirements { get; set; }
-        public required string TeamLeadId { get; set; }
-        public required List<ProjectMember> Members { get; set; }
+        public string Requirements { get; set; } = string.Empty;
+        public string TeamLeadId { get; set; } = string.Empty;
+        public List<ProjectMember> Members { get; set; } = new();
         public bool IsArchived { get; set; }
     }
 
@@ -22,7 +22,7 @@ namespace ProjectManagementApp.API.Models
     {
         public int Id { get; set; }
         public int ProjectId { get; set; }
-        public required string UserId { get; set; }
-        public required string Role { get; set; } // TeamLead, Employee
+        public string UserId { get; set; } = string.Empty;
+        public string Role { get; set; } = string.Empty; // TeamLead, Employee
     }
 } 
