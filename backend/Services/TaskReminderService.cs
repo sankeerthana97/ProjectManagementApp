@@ -23,37 +23,65 @@ namespace ProjectManagementApp.API.Services
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                using (var scope = _serviceProvider.CreateScope())
+                try
                 {
-                    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                    var emailService = scope.ServiceProvider.GetRequiredService<EmailService>();
-                    var userManager = scope.ServiceProvider.GetRequiredService<Microsoft.AspNetCore.Identity.UserManager<ApplicationUser>>();
-                    var now = DateTime.UtcNow;
-                    var soon = now.AddDays(2);
-                    var tasks = await db.Tasks
-                        .Where(t => t.Status != "Done" && t.DueDate <= soon)
-                        .ToListAsync();
-                    foreach (var task in tasks)
+                    using (var scope = _serviceProvider.CreateScope())
                     {
-                        var user = await userManager.FindByIdAsync(task.AssignedToId);
-                        if (user != null && !string.IsNullOrEmpty(user.Email))
+                        var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                        var emailService = scope.ServiceProvider.GetRequiredService<EmailService>();
+                        var userManager = scope.ServiceProvider.GetRequiredService<Microsoft.AspNetCore.Identity.UserManager<ApplicationUser>>();
+                        var now = DateTime.UtcNow;
+                        var soon = now.AddDays(2);
+                        var tasks = await db.Tasks
+                            .Where(t => t.Status != "Done" && t.DueDate <= soon)
+                            .ToListAsync(stoppingToken);
+                        foreach (var task in tasks)
                         {
-                            string subject, body;
-                            if (task.DueDate < now)
+                            if (stoppingToken.IsCancellationRequested) break;
+                            
+                            var user = await userManager.FindByIdAsync(task.AssignedToId);
+                            if (user != null && !string.IsNullOrEmpty(user.Email))
                             {
-                                subject = "Task Overdue";
-                                body = $"Your task '{task.Title}' is overdue! Please update its status.";
+                                string subject, body;
+                                if (task.DueDate < now)
+                                {
+                                    subject = "Task Overdue";
+                                    body = $"Your task '{task.Title}' is overdue! Please update its status.";
+                                }
+                                else
+                                {
+                                    subject = "Task Deadline Approaching";
+                                    body = $"Your task '{task.Title}' is due on {task.DueDate:d}. Please ensure it is completed on time.";
+                                }
+                                await emailService.SendEmailAsync(user.Email, subject, body);
                             }
-                            else
-                            {
-                                subject = "Task Deadline Approaching";
-                                body = $"Your task '{task.Title}' is due on {task.DueDate:d}. Please ensure it is completed on time.";
-                            }
-                            await emailService.SendEmailAsync(user.Email, subject, body);
                         }
                     }
+
+                    try
+                    {
+                        await Task.Delay(_interval, stoppingToken);
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        // Normal shutdown, exit gracefully
+                        break;
+                    }
                 }
-                await Task.Delay(_interval, stoppingToken);
+                catch (Exception ex) when (ex is not OperationCanceledException)
+                {
+                    // Log the error but don't stop the service
+                    Console.WriteLine($"Error in TaskReminderService: {ex.Message}");
+                    try
+                    {
+                        // Wait a bit before retrying, but respect cancellation
+                        await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken);
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        break;
+                    }
+                }
             }
         }
     }
