@@ -6,17 +6,6 @@ namespace ProjectManagementApp.API.Models
     public class Project
     {
         public int Id { get; set; }
-<<<<<<< Updated upstream
-        public string Name { get; set; } = string.Empty;
-        public string SkillsRequired { get; set; } = string.Empty ;
-        public string Category { get; set; } = string.Empty;// Minor, Major
-        public string Priority { get; set; } = string.Empty;// High, Medium, Low
-        public DateTime StartDate { get; set; }
-        public DateTime Deadline { get; set; }
-        public string Requirements { get; set; } = string.Empty;
-        public string TeamLeadId { get; set; } = string.Empty;
-        public List<ProjectMember> Members { get; set; } = new List<ProjectMember>();
-=======
         public required string Name { get; set; }
         public required string SkillsRequired { get; set; }
         public required string Category { get; set; } // Minor, Major
@@ -26,7 +15,6 @@ namespace ProjectManagementApp.API.Models
         public required string Requirements { get; set; }
         public required string TeamLeadId { get; set; }
         public required List<ProjectMember> Members { get; set; }
->>>>>>> Stashed changes
         public bool IsArchived { get; set; }
     }
 
