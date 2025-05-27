@@ -75,6 +75,13 @@ builder.Services.AddHostedService<ProjectManagementApp.API.Services.TaskReminder
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+// Serve index.html for the root path explicitly
+app.MapGet("/", async context =>
+{
+    context.Response.ContentType = "text/html";
+    await context.Response.SendFileAsync(Path.Combine(app.Environment.WebRootPath, "index.html"));
+});
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
